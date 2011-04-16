@@ -8,7 +8,7 @@ module Ghaki module Env module EngineTesting
 
     ########################################################################
     subject { Ghaki::Env::Engine.instance }
-    context 'singleton' do
+    context 'singleton instance' do
       it { should respond_to :environment }
       it { should respond_to :environment= }
       it { should respond_to :assert_environment }
@@ -31,12 +31,12 @@ module Ghaki module Env module EngineTesting
 
     ########################################################################
     describe '#assert_environment' do
-      it 'should complain when missing' do
+      it 'complains when missing' do
         lambda {
           subject.assert_environment
         }.should raise_error( ArgumentError, 'Missing Environment' )
       end
-      it 'should not complain when present' do
+      it 'does not complain when present' do
         subject.environment = 'production'
         lambda {
           subject.assert_environment
@@ -46,7 +46,7 @@ module Ghaki module Env module EngineTesting
 
     ########################################################################
     describe '#clear_environment' do
-      it 'should clean environment' do
+      it 'cleans environment' do
         subject.environment = 'test'
         subject.clear_environment
         lambda {
@@ -58,80 +58,45 @@ module Ghaki module Env module EngineTesting
     before(:each) do subject.clear_environment end
 
     ########################################################################
-    describe 'using explicit assignment' do
-      before(:each) do
-        subject.environment = 'production'
-      end
-      it '#detect_environment' do subject.detect_environment.should == :production end
-      it '#environment'        do subject.environment.should        == :production end
-    end
-
-    ########################################################################
-    context 'using ENV[GHAKI_RUN_ENV]' do
-      before(:each) do
-        ENV['GHAKI_RUN_ENV'] = 'development'
-      end
-      it '#detect_environment' do subject.detect_environment.should == :development end
-      it '#environment'        do subject.environment.should        == :development end
-    end
-
-    ########################################################################
-    context 'using ENV[RAILS_ENV]' do
-      before(:each) do
-        ENV['RAILS_ENV'] = 'development'
-      end
-      it '#detect_environment' do subject.detect_environment.should == :development end
-      it '#environment'        do subject.environment.should        == :development end
-    end
-
-    ########################################################################
-    context 'using ENV[RACK_ENV]' do
-      before(:each) do
-        ENV['RACK_ENV'] = 'test'
-      end
-      it '#detect_environment' do subject.detect_environment.should == :test end
-      it '#environment'        do subject.environment.should        == :test end
-    end
-
-    ########################################################################
-    context 'using RAILS_ENV' do
-      before(:each) do
-        ::RAILS_ENV = 'development'
-      end
-      it '#detect_environment' do subject.detect_environment.should == :development end
-      it '#environment'        do subject.environment.should        == :development end
-    end
-
-    ########################################################################
-    context 'using Merb' do
-      before(:each) do
-        if not defined? ::Merb
-          class ::Merb
-            def environment ; return 'test' end
-          end
-        end
+    USING_SETUP = {
+      'explicit assignment' => [ :production,  lambda {
+        Ghaki::Env::Engine.instance.environment  = 'production'
+      }],
+      'ENV[GHAKI_RUN_ENV]'  => [ :development, lambda { ENV['GHAKI_RUN_ENV'] = 'development' }],
+      'ENV[RAILS_ENV]'      => [ :development, lambda { ENV['RAILS_ENV']     = 'development' }],
+      'ENV[RACK_ENV]'       => [ :test,        lambda { ENV['RACK_ENV']      = 'test' }],
+      'RAILS_ENV'           => [ :development, lambda { ::RAILS_ENV          = 'development' }],
+      'Merb'                => [ :production,  lambda {
+        Object::const_set( :Merb, Class::new )
         ::Merb.expects(:environment).returns('production')
-      end
-      it '#detect_environment' do subject.detect_environment.should == :production end
-      it '#environment'        do subject.environment.should        == :production end
-    end
-
+      }],
+      'Sinatra'             => [ :test,        lambda {
+        Object::const_set( :Sinatra, Class::new )
+        ::Sinatra.expects(:environment).returns('test')
+      }],
+    }
 
     ########################################################################
-    context 'using Sinatra' do
-      before(:each) do
-        if not defined? ::Sinatra
-          class ::Sinatra
-            def environment; return 'test' end
-          end
+    describe '#detect_environment' do
+      USING_SETUP.each_key do |desc|
+        want,func = USING_SETUP[desc]
+        it "detects #{desc}" do
+          func.call
+          subject.detect_environment.should == want
         end
-        ::Sinatra.expects(:environment).returns('test')
       end
-      it '#detect_environment' do subject.detect_environment.should == :test end
-      it '#environment'        do subject.environment.should        == :test end
     end
 
+    ########################################################################
+    describe '#environment' do
+      USING_SETUP.each_key do |desc|
+        want,func = USING_SETUP[desc]
+        it "accepts #{desc}" do
+          func.call
+          subject.environment.should == want
+        end
+      end
+    end
 
   end
 end end end
-############################################################################
