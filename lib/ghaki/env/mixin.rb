@@ -9,7 +9,7 @@ module Env   #:nodoc:
   module Mixin
     extend Forwardable
 
-    def_delegators Ghaki::Env::Engine.instance,
+    def_delegators 'Ghaki::Env::Engine.instance',
       :environment,:environment=,:clear_environment,
       :assert_environment,:detect_environment
 
