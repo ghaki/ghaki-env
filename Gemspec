@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
 
   # gem dependencies
 
-  s.add_dependency 'ghaki-app', '>= 1.0.1'
+  s.add_dependency 'ghaki-app', '>= 1.1.2'
 
   s.add_development_dependency 'rspec', '>= 2.4.0'
   s.add_development_dependency 'mocha', '>= 0.9.12'
