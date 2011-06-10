@@ -1,22 +1,26 @@
 require 'rubygems'
 require 'rake'
-require 'rake/gempackagetask'
-require 'rake/rdoctask'
-require 'rspec/core/rake_task'
 
+gem 'rspec'
+require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'spec/**/*_spec.rb'
   t.rspec_opts = %w[--color]
   t.verbose = true
 end
 
-Rake::RDocTask.new('rdoc') do |t|
-  t.rdoc_files.include( 'README', 'lib/**/*.rb')
-  t.main = 'README'
-  t.title = 'Ghaki Env API Documention'
+require 'rake/gempackagetask'
+gem_spec = Gem::Specification.load('Gemspec')
+Rake::GemPackageTask.new(gem_spec) do |pkg|
+  pkg.need_zip = false
+  pkg.need_tar = false
 end
 
-Rake::GemPackageTask.new( Gem::Specification.load('Gemspec') ) do |pkg|
-  pkg.need_zip = true
-  pkg.need_tar = true
+if gem_spec.has_rdoc
+  require 'rake/rdoctask'
+  Rake::RDocTask.new('rdoc') do |t|
+    t.rdoc_files.include( *gem_spec.extra_rdoc_files, 'lib/**/*.rb')
+    t.main = 'README'
+    t.title = gem_spec.description
+  end
 end
