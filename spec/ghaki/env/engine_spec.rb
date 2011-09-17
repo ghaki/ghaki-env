@@ -1,6 +1,5 @@
 ############################################################################
 require 'ghaki/env/engine'
-require 'mocha_helper'
 
 ############################################################################
 module Ghaki module Env module EngineTesting
