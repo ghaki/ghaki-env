@@ -1,23 +1,27 @@
 Gem::Specification.new do |s|
 
-  s.name = 'ghaki-env'
-  s.summary = 'Ghaki Env run mode discovery helpers'
-  s.description = 'Ghaki Env is a collection of application helpers for dealing with the run time environment.'
+  s.name        = 'ghaki-env'
+  s.summary     = 'Run mode discovery helpers'
+  s.description = 'Collection of application helpers for dealing with the run time environment.'
 
   s.version = IO.read(File.expand_path('VERSION')).chomp
+
+  s.authors  = ['Gerald Kalafut']
+  s.email    = 'gerald@kalafut.org'
+  s.homepage = 'http://github.com/ghaki'
+
+  # rubygem setup
+  s.platform                  = Gem::Platform::RUBY
   s.required_rubygems_version = '>= 1.3.6'
+  s.rubyforge_project         = s.name
 
-  s.authors = ['Gerald Kalafut']
-  s.email = 'gerald@kalafut.org'
-  s.homepage = 'http://ghaki.com/'
-
-  # gem dependencies
-
+  # prod dependencies
   s.add_dependency 'ghaki-app', '>= 1.1.2'
 
+  # devel dependencies
   s.add_development_dependency 'rspec', '>= 2.4.0'
   s.add_development_dependency 'mocha', '>= 0.9.12'
-  s.add_development_dependency 'rdoc', '>= 3.9.4'
+  s.add_development_dependency 'rdoc',  '>= 3.9.4'
 
   # rdoc setup
   s.has_rdoc = true
@@ -28,5 +32,4 @@ Gem::Specification.new do |s|
   s.test_files = Dir['spec/**/*_spec.rb','*spec/**/*_helper.rb']
 
   s.require_path = 'lib'
-
 end
